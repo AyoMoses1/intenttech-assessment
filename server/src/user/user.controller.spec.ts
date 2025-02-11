@@ -1,107 +1,187 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserController } from './user.controller';
-import { AuthService } from './services/auth/auth.service';
-import { UserService } from './services/user/user.service';
-import { PasswordService } from './services/password/password.service';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from './services/jwt/jwt.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { mockUserEntity } from './entities/__fixtures__/user-entity.fixture';
+import { Test, TestingModule } from "@nestjs/testing";
+import { UserController } from "./user.controller";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { UserInfo } from "./entities/user-info.entity";
+import { UserContact } from "./entities/user-contact.entity";
+import { UserAddress } from "./entities/user-address.entity";
+import { UserAcademic } from "./entities/user-academic.entity";
+import { mockCompleteUserInfo } from "./entities/__fixtures__/user-entity.fixture";
+import { UserService } from "./services/user/user.service";
+import { CreateUserDto } from "./dto/create-user.dto";
 
-describe('UserController', () => {
+describe("UserController", () => {
   let controller: UserController;
-  let authService: AuthService;
   let userService: UserService;
+
+  const mockRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    remove: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
-        AuthService,
         UserService,
-        PasswordService,
-        ConfigService,
-        JwtService,
         {
-          provide: getRepositoryToken(UserEntity),
-          useValue: {},
+          provide: getRepositoryToken(UserInfo),
+          useValue: mockRepository,
         },
         {
-          provide: 'CACHE_MANAGER',
-          useValue: jest.fn(),
+          provide: getRepositoryToken(UserContact),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(UserAddress),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(UserAcademic),
+          useValue: mockRepository,
         },
       ],
     }).compile();
 
     controller = module.get<UserController>(UserController);
-    authService = module.get<AuthService>(AuthService);
     userService = module.get<UserService>(UserService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  describe('register method', () => {
-    it('should register user', async () => {
-      jest.spyOn(authService, 'register').mockResolvedValue({
-        id: '23092ddf-1954-4587-8d70-bf6d2ebe6f5a',
-        token: 'token',
-        firstName: 'firstName',
-        lastName: 'lastName',
-        email: 'email',
-        passwordHash: 'p',
-        businessName: 'businessName',
-        dateCreated: new Date(),
-        dateUpdated: new Date(),
-      });
-
-      expect(
-        await controller.register({
-          firstName: 'firstName',
-          lastName: 'lastName',
-          email: 'email',
-          password: 'p',
-          businessName: 'businessName',
-        }),
-      ).toStrictEqual({
-        message: 'User created',
-        user: {
-          id: 0,
-          token: 'token',
+  describe("create method", () => {
+    it("should create a new user with all related information", async () => {
+      const createUserDto = {
+        profilePhoto: "https://example.com/photo.jpg",
+        firstName: "John",
+        lastName: "Doe",
+        dob: new Date("1990-01-01"),
+        occupation: "Software Engineer",
+        gender: "Male",
+        contact: {
+          email: "john.doe@example.com",
+          phoneNumber: "+1234567890",
+          fax: "123-456-7890",
+          linkedInUrl: "https://linkedin.com/in/johndoe",
         },
+        address: {
+          address: "123 Main Street",
+          city: "New York",
+          state: "NY",
+          country: "USA",
+          zipCode: "10001",
+        },
+        academics: [
+          {
+            schoolName: "Harvard University",
+            degree: "Computer Science",
+            graduationYear: 2020,
+            description: "Graduated with honors",
+          },
+        ],
+      };
+
+      jest
+        .spyOn(userService, "create")
+        .mockResolvedValue(mockCompleteUserInfo as UserInfo);
+
+      const result = await controller.create(createUserDto);
+
+      expect(result).toEqual({
+        message: "User created successfully",
+        user: mockCompleteUserInfo,
       });
     });
   });
 
-  describe('login method', () => {
-    it('should login user', async () => {
-      jest.spyOn(authService, 'login').mockResolvedValue('mock-token');
+  describe("findAll method", () => {
+    it("should retrieve all users", async () => {
+      const mockUsers = [mockCompleteUserInfo] as UserInfo[];
+      jest.spyOn(userService, "findAll").mockResolvedValue(mockUsers);
 
-      expect(
-        await controller.login({
-          email: 'email',
-          password: 'p',
-        }),
-      ).toStrictEqual({
-        message: 'Login successful',
-        token: 'mock-token',
+      const result = await controller.findAll();
+
+      expect(result).toEqual({
+        message: "Users retrieved successfully",
+        users: mockUsers,
       });
     });
   });
 
-  describe('getUsers method', () => {
-    it('should retrieve all users', async () => {
-      const userServiceSpy = jest
-        .spyOn(userService, 'getAll')
-        .mockResolvedValue([mockUserEntity]);
+  describe("findOne method", () => {
+    it("should retrieve a single user", async () => {
+      jest
+        .spyOn(userService, "findOne")
+        .mockResolvedValue(mockCompleteUserInfo as UserInfo);
 
-      expect(await controller.getUsers()).toStrictEqual({
-        message: 'Users retrieved successfully',
-        users: [mockUserEntity],
+      const result = await controller.findOne("1");
+
+      expect(result).toEqual({
+        message: "User retrieved successfully",
+        user: mockCompleteUserInfo,
       });
-      expect(userServiceSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("update method", () => {
+    it("should update a user", async () => {
+      const updateUserDto: CreateUserDto = {
+        firstName: "Jane",
+        lastName: "Doe",
+        dob: new Date("1990-01-01"), // Added missing required field
+        occupation: "Senior Engineer",
+        gender: "Female", // Added missing required field
+        contact: {
+          email: "jane.doe@example.com",
+          phoneNumber: "+1987654321",
+          fax: undefined, // Optional field
+          linkedInUrl: undefined, // Optional field
+        },
+        address: {
+          address: "456 Market St", // Added missing required field
+          city: "San Francisco",
+          state: "CA",
+          country: "USA", // Added missing required field
+          zipCode: "94105", // Added missing required field
+        },
+        academics: [
+          {
+            schoolName: "MIT",
+            degree: "Masters in CS",
+            graduationYear: 2022,
+            description: "With honors", // Optional field
+          },
+        ],
+      };
+
+      jest
+        .spyOn(userService, "update")
+        .mockResolvedValue(mockCompleteUserInfo as UserInfo);
+
+      const result = await controller.update("1", updateUserDto);
+
+      expect(result).toEqual({
+        message: "User updated successfully",
+        user: mockCompleteUserInfo,
+      });
+    });
+  });
+
+  describe("remove method", () => {
+    it("should remove a user", async () => {
+      jest.spyOn(userService, "remove").mockResolvedValue(undefined);
+
+      const result = await controller.remove("1");
+
+      expect(result).toEqual({
+        message: "User deleted successfully",
+      });
     });
   });
 });
