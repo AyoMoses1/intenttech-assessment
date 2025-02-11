@@ -1,8 +1,12 @@
 // src/user/user.service.ts
 
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { UserInfo } from "src/user/entities/user-info.entity";
 import { UserAddress } from "src/user/entities/user-address.entity";
 import { UserAcademic } from "src/user/entities/user-academic.entity";
@@ -22,7 +26,49 @@ export class UserService {
     private userAcademicRepository: Repository<UserAcademic>
   ) {}
 
+  private async checkDuplicateContact(
+    email: string,
+    phoneNumber: string,
+    excludeUserId?: number
+  ): Promise<void> {
+    interface WhereClause {
+      email?: string;
+      phoneNumber?: string;
+      userInfo?: {
+        id: any; // Using any here because Not(excludeUserId) doesn't have a simple type
+      };
+    }
+
+    const whereClause: WhereClause[] = [{ email }, { phoneNumber }];
+
+    if (excludeUserId) {
+      whereClause.forEach((clause: WhereClause) => {
+        clause.userInfo = { id: Not(excludeUserId) };
+      });
+    }
+
+    const existingContact = await this.userContactRepository.findOne({
+      where: whereClause,
+      relations: ["userInfo"],
+    });
+
+    if (existingContact) {
+      if (existingContact.email === email) {
+        throw new ConflictException(`User with email ${email} already exists`);
+      }
+      if (existingContact.phoneNumber === phoneNumber) {
+        throw new ConflictException(
+          `User with phone number ${phoneNumber} already exists`
+        );
+      }
+    }
+  }
+
   async create(createUserDto: CreateUserDto): Promise<UserInfo> {
+    await this.checkDuplicateContact(
+      createUserDto.contact.email,
+      createUserDto.contact.phoneNumber
+    );
     // Create UserInfo instance
     const userInfo = this.userInfoRepository.create({
       profilePhoto: createUserDto.profilePhoto,

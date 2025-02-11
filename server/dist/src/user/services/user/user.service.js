@@ -27,7 +27,28 @@ let UserService = class UserService {
         this.userAddressRepository = userAddressRepository;
         this.userAcademicRepository = userAcademicRepository;
     }
+    async checkDuplicateContact(email, phoneNumber, excludeUserId) {
+        const whereClause = [{ email }, { phoneNumber }];
+        if (excludeUserId) {
+            whereClause.forEach((clause) => {
+                clause.userInfo = { id: (0, typeorm_2.Not)(excludeUserId) };
+            });
+        }
+        const existingContact = await this.userContactRepository.findOne({
+            where: whereClause,
+            relations: ["userInfo"],
+        });
+        if (existingContact) {
+            if (existingContact.email === email) {
+                throw new common_1.ConflictException(`User with email ${email} already exists`);
+            }
+            if (existingContact.phoneNumber === phoneNumber) {
+                throw new common_1.ConflictException(`User with phone number ${phoneNumber} already exists`);
+            }
+        }
+    }
     async create(createUserDto) {
+        await this.checkDuplicateContact(createUserDto.contact.email, createUserDto.contact.phoneNumber);
         const userInfo = this.userInfoRepository.create({
             profilePhoto: createUserDto.profilePhoto,
             firstName: createUserDto.firstName,

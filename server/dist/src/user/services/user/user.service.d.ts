@@ -10,6 +10,7 @@ export declare class UserService {
     private userAddressRepository;
     private userAcademicRepository;
     constructor(userInfoRepository: Repository<UserInfo>, userContactRepository: Repository<UserContact>, userAddressRepository: Repository<UserAddress>, userAcademicRepository: Repository<UserAcademic>);
+    private checkDuplicateContact;
     create(createUserDto: CreateUserDto): Promise<UserInfo>;
     findAll(): Promise<UserInfo[]>;
     findOne(id: number): Promise<UserInfo>;
