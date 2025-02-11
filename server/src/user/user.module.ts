@@ -1,28 +1,23 @@
-import { Module } from '@nestjs/common';
-import { UserController } from './user.controller';
-import { AuthService } from './services/auth/auth.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { UserService } from './services/user/user.service';
-import { PasswordService } from './services/password/password.service';
-import { JwtService } from './services/jwt/jwt.service';
-import { ConfigModule } from '@nestjs/config';
-import { JwtStrategy } from './services/auth/strategies/jwt/jwt.strategy';
-import { AppCacheModule } from '../app-cache/app-cache.module';
+// src/user/user.module.ts
 
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserController } from './user.controller';
+import { UserInfo } from './entities/user-info.entity';
+import { UserContact } from './entities/user-contact.entity';
+import { UserAddress } from './entities/user-address.entity';
+import { UserAcademic } from './entities/user-academic.entity';
+import { UserService } from './services/user/user.service';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    ConfigModule,
-    AppCacheModule,
+    TypeOrmModule.forFeature([
+      UserInfo,
+      UserContact,
+      UserAddress,
+      UserAcademic
+    ]),
   ],
   controllers: [UserController],
-  providers: [
-    AuthService,
-    UserService,
-    PasswordService,
-    JwtService,
-    JwtStrategy,
-  ],
+  providers: [UserService],
 })
 export class UserModule {}

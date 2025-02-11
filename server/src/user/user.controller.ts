@@ -1,60 +1,43 @@
+// src/user/user.controller.ts
+
 import {
-  Body,
   Controller,
   Get,
   Post,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { AuthService } from './services/auth/auth.service';
-import { LoginDto } from './dto/login.dto';
-import { UserService } from './services/user/user.service';
-import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UserService } from "./services/user/user.service";
 
-@ApiTags('user')
-@Controller('user')
+@Controller("users")
 export class UserController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  @Post('register')
-  async register(@Body() user: CreateUserDto) {
-    const newUser = await this.authService.register(user);
-
-    return {
-      message: 'User created',
-      user: {
-        id: newUser.id,
-        token: newUser.token,
-      },
-    };
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
-  @Post('login')
-  async login(@Body() login: LoginDto) {
-    const token = await this.authService.login(login);
-
-    return {
-      message: 'Login successful',
-      token,
-    };
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(CacheInterceptor)
   @Get()
-  async getUsers() {
-    const users = await this.userService.getAll();
+  findAll() {
+    return this.userService.findAll();
+  }
 
-    return {
-      message: 'Users retrieved successfully',
-      users,
-    };
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.userService.findOne(+id);
+  }
+
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateUserDto: CreateUserDto) {
+    return this.userService.update(+id, updateUserDto);
+  }
+
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.userService.remove(+id);
   }
 }
