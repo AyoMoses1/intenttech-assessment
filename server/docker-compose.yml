@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  ### DB ################################################
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: intenttech
+      POSTGRES_USER: postgres
+    volumes:
+      - ./.data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  ### Redis ################################################
+  redis:
+    image: redis:latest
+    volumes:
+      - ./.data/redis:/data
+    ports:
+      - "6379:6379"
+
+  ### Mail trap ################################################
+  mailhog:
+    image: mailhog/mailhog
+    restart: always
+    ports: 
+      - "1025:1025"
+      - "8025:8025"
