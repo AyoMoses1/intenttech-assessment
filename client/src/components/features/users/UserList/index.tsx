@@ -11,6 +11,7 @@ export function UserList() {
   const { data: users, isLoading, error } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
 
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users</div>;
 

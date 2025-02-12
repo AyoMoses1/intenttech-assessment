@@ -1,5 +1,5 @@
 // src/components/features/users/UserList/UserCard/UserCard.tsx
-'use client';
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export function UserCard({ user, onDelete }: UserCardProps) {
           <div className="flex items-center space-x-4">
             {user.profilePhoto ? (
               <img
-                src={user.profilePhoto}
+                src={user.profilePhoto as string}
                 alt={`${user.firstName} ${user.lastName}`}
                 className="h-12 w-12 rounded-full object-cover"
               />

@@ -74,12 +74,11 @@ export default function UserDetailsPage() {
           {/* Basic Info Section */}
           <div className="border-b p-6">
             <div className="flex items-center gap-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200">
-                <span className="text-2xl font-bold text-gray-600">
-                  {user.firstName[0]}
-                  {user.lastName[0]}
-                </span>
-              </div>
+              <img
+                src={user.profilePhoto as string}
+                alt={`${user.firstName} ${user.lastName}`}
+                className="h-20 w-20 rounded-full object-cover"
+              />
               <div>
                 <h2 className="text-xl font-bold">
                   {user.firstName} {user.lastName}

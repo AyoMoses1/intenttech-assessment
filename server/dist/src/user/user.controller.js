@@ -32,7 +32,8 @@ let UserController = class UserController {
                 const uploadResult = await this.cloudinaryService.uploadDocument(files.profilePhoto[0]);
                 profilePhotoUrl = uploadResult.secure_url;
             }
-            else if (createUserDto.profilePhoto && createUserDto.profilePhoto.startsWith('data:image')) {
+            else if (createUserDto.profilePhoto &&
+                createUserDto.profilePhoto.startsWith("data:image")) {
                 const uploadResult = await this.cloudinaryService.uploadBase64(createUserDto.profilePhoto);
                 profilePhotoUrl = uploadResult.secure_url;
             }
@@ -93,7 +94,7 @@ let UserController = class UserController {
                 const uploadResult = await this.cloudinaryService.uploadDocument(files.profilePhoto[0]);
                 profilePhotoUrl = uploadResult.secure_url;
             }
-            else if ((_b = updateUserDto.profilePhoto) === null || _b === void 0 ? void 0 : _b.startsWith('data:image')) {
+            else if ((_b = updateUserDto.profilePhoto) === null || _b === void 0 ? void 0 : _b.startsWith("data:image")) {
                 const uploadResult = await this.cloudinaryService.uploadBase64(updateUserDto.profilePhoto);
                 profilePhotoUrl = uploadResult.secure_url;
             }

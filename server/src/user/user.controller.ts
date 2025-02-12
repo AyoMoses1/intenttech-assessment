@@ -47,9 +47,12 @@ export class UserController {
           files.profilePhoto[0]
         );
         profilePhotoUrl = uploadResult.secure_url;
-      } 
+      }
       // Handle base64 string if present
-      else if (createUserDto.profilePhoto && createUserDto.profilePhoto.startsWith('data:image')) {
+      else if (
+        createUserDto.profilePhoto &&
+        createUserDto.profilePhoto.startsWith("data:image")
+      ) {
         const uploadResult = await this.cloudinaryService.uploadBase64(
           createUserDto.profilePhoto
         );
@@ -143,9 +146,9 @@ export class UserController {
           files.profilePhoto[0]
         );
         profilePhotoUrl = uploadResult.secure_url;
-      } 
+      }
       // Handle base64 string if it's changed
-      else if (updateUserDto.profilePhoto?.startsWith('data:image')) {
+      else if (updateUserDto.profilePhoto?.startsWith("data:image")) {
         const uploadResult = await this.cloudinaryService.uploadBase64(
           updateUserDto.profilePhoto
         );
