@@ -1,7 +1,6 @@
 "use client";
 
 import { UserList } from "@/components/features/users/UserList";
-import { ReduxProvider } from "@/providers/ReduxProvider";
 import Link from "next/link";
 
 export default function UsersPage() {
