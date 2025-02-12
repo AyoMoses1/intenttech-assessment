@@ -1,4 +1,4 @@
-// src/components/features/users/UserResume/UserResume.tsx
+"use client";
 
 import { UserInfo } from "@/types/user.types";
 

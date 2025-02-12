@@ -1,5 +1,6 @@
-// src/features/users/usersApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+"use client";
+
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; // Changed this line
 import type { UserInfo, CreateUserDto } from "../../types/user.types";
 
 export const usersApi = createApi({
@@ -11,7 +12,7 @@ export const usersApi = createApi({
       query: () => "users",
       providesTags: ["User"],
     }),
-    getUserById: builder.query<UserInfo, string>({
+    getUserById: builder.query<UserInfo, number>({
       query: (id) => `users/${id}`,
       providesTags: ["User"],
     }),
@@ -25,7 +26,7 @@ export const usersApi = createApi({
     }),
     updateUser: builder.mutation<
       UserInfo,
-      { id: string; data: Partial<CreateUserDto> }
+      { id: number; data: Partial<CreateUserDto> }
     >({
       query: ({ id, data }) => ({
         url: `users/${id}`,

@@ -1,7 +1,10 @@
-// src/components/features/users/UserList/UserList.tsx
+// components/features/users/UserList/index.tsx
+"use client";
 
-
-import { useDeleteUserMutation, useGetUsersQuery } from "@/features/users/UsersApi";
+import {
+  useDeleteUserMutation,
+  useGetUsersQuery,
+} from "@/features/users/UsersApi"; // Check this path
 import { UserCard } from "../UserCard";
 
 export function UserList() {
