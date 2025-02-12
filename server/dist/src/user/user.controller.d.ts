@@ -7,7 +7,7 @@ export declare class UserController {
     private readonly userService;
     private readonly cloudinaryService;
     constructor(userService: UserService, cloudinaryService: CloudinaryService);
-    create(createUserDto: CreateUserDto, files: {
+    create(createUserDto: CreateUserDto, files?: {
         profilePhoto?: Express.Multer.File[];
     }): Promise<{
         message: string;
@@ -21,7 +21,7 @@ export declare class UserController {
         message: string;
         user: UserInfo;
     }>;
-    update(id: string, updateUserDto: CreateUserDto, files: {
+    update(id: string, updateUserDto: CreateUserDto, files?: {
         profilePhoto?: Express.Multer.File[];
     }): Promise<{
         message: string;

@@ -9,7 +9,8 @@ const swagger_1 = require("@nestjs/swagger");
 const helmet_1 = require("helmet");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.use((0, body_parser_1.json)());
+    app.use((0, body_parser_1.json)({ limit: "50mb" }));
+    app.use((0, body_parser_1.urlencoded)({ extended: true, limit: "50mb" }));
     app.enableCors({
         origin: "*",
         methods: "*",

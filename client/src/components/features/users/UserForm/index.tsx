@@ -102,8 +102,6 @@ export function UserForm({
   };
 
   const handleSubmit = async (data: CreateUserDto) => {
-    console.log({ data });
-
     if (externalSubmit) {
       await externalSubmit(data);
     } else {

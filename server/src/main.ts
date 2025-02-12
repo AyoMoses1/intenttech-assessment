@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { AppLoggerService } from "./logger/services/app-logger/app-logger.service";
-import { json } from "body-parser";
+import { json, urlencoded } from "body-parser";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 
@@ -13,7 +13,8 @@ async function bootstrap() {
     Required to be executed before async storage middleware
     and not loose context on POST requests
    */
-  app.use(json());
+  app.use(json({ limit: "50mb" }));
+  app.use(urlencoded({ extended: true, limit: "50mb" }));
 
   app.enableCors({
     origin: "*",

@@ -15,27 +15,45 @@ export function PersonalInfoStep() {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const profilePhoto = watch("profilePhoto");
 
-  console.log({ previewUrl });
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
 
-    console.log({ file });
     if (file) {
+      // Create object URL for preview
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
 
-      setValue("profilePhoto", file);
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Set the base64 string as the profile photo value
+        const base64String = reader.result as string;
+        setValue("profilePhoto", base64String);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   useEffect(() => {
     return () => {
+      // Cleanup object URL on component unmount
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
     };
   }, [previewUrl]);
+
+  // If profilePhoto is a base64 string, use it for preview
+  useEffect(() => {
+    if (
+      typeof profilePhoto === "string" &&
+      profilePhoto.startsWith("data:image")
+    ) {
+      setPreviewUrl(profilePhoto);
+    }
+  }, [profilePhoto]);
 
   return (
     <div className="space-y-6">
@@ -51,7 +69,7 @@ export function PersonalInfoStep() {
             {(previewUrl || profilePhoto) && (
               <div className="relative h-20 w-20 overflow-hidden rounded-full bg-muted">
                 <img
-                  src={previewUrl || (profilePhoto as string)}
+                  src={previewUrl}
                   alt="Profile preview"
                   className="h-full w-full object-cover"
                 />

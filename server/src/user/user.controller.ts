@@ -1,5 +1,3 @@
-// src/user/user.controller.ts
-
 import {
   Controller,
   Get,
@@ -36,16 +34,24 @@ export class UserController {
   async create(
     @Body() createUserDto: CreateUserDto,
     @UploadedFiles()
-    files: {
+    files?: {
       profilePhoto?: Express.Multer.File[];
     }
   ): Promise<{ message: string; user: UserInfo }> {
     try {
       let profilePhotoUrl = "";
 
-      if (files.profilePhoto && files.profilePhoto[0]) {
+      // Handle file upload if present
+      if (files?.profilePhoto?.[0]) {
         const uploadResult = await this.cloudinaryService.uploadDocument(
           files.profilePhoto[0]
+        );
+        profilePhotoUrl = uploadResult.secure_url;
+      } 
+      // Handle base64 string if present
+      else if (createUserDto.profilePhoto && createUserDto.profilePhoto.startsWith('data:image')) {
+        const uploadResult = await this.cloudinaryService.uploadBase64(
+          createUserDto.profilePhoto
         );
         profilePhotoUrl = uploadResult.secure_url;
       }
@@ -124,16 +130,24 @@ export class UserController {
     @Param("id") id: string,
     @Body() updateUserDto: CreateUserDto,
     @UploadedFiles()
-    files: {
+    files?: {
       profilePhoto?: Express.Multer.File[];
     }
   ): Promise<{ message: string; user: UserInfo }> {
     try {
       let profilePhotoUrl = updateUserDto.profilePhoto;
 
-      if (files.profilePhoto && files.profilePhoto[0]) {
+      // Handle file upload if present
+      if (files?.profilePhoto?.[0]) {
         const uploadResult = await this.cloudinaryService.uploadDocument(
           files.profilePhoto[0]
+        );
+        profilePhotoUrl = uploadResult.secure_url;
+      } 
+      // Handle base64 string if it's changed
+      else if (updateUserDto.profilePhoto?.startsWith('data:image')) {
+        const uploadResult = await this.cloudinaryService.uploadBase64(
+          updateUserDto.profilePhoto
         );
         profilePhotoUrl = uploadResult.secure_url;
       }

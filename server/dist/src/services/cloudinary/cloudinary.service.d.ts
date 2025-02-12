@@ -1,5 +1,5 @@
 /// <reference types="multer" />
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from "@nestjs/config";
 interface CloudinaryResponse {
     public_id: string;
     version: number;
@@ -18,6 +18,7 @@ export declare class CloudinaryService {
     private readonly configService;
     constructor(configService: ConfigService);
     uploadDocument(file: Express.Multer.File, folder?: string): Promise<CloudinaryResponse>;
+    uploadBase64(base64String: string, folder?: string): Promise<CloudinaryResponse>;
     deleteFile(public_id: string): Promise<void>;
 }
 export {};

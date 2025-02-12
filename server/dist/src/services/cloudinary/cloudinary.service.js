@@ -16,23 +16,23 @@ const cloudinary_1 = require("cloudinary");
 let CloudinaryService = class CloudinaryService {
     constructor(configService) {
         this.configService = configService;
-        const { cloudName, apiKey, apiSecret } = configService.get('cloudinary');
+        const { cloudName, apiKey, apiSecret } = configService.get("cloudinary");
         cloudinary_1.v2.config({
             cloud_name: cloudName,
             api_key: apiKey,
             api_secret: apiSecret,
         });
     }
-    async uploadDocument(file, folder = 'business_documents') {
+    async uploadDocument(file, folder = "business_documents") {
         return new Promise((resolve, reject) => {
             const uploadStream = cloudinary_1.v2.uploader.upload_stream({
                 folder,
-                resource_type: 'auto',
-                allowed_formats: ['pdf', 'png', 'jpg', 'jpeg'],
+                resource_type: "auto",
+                allowed_formats: ["pdf", "png", "jpg", "jpeg"],
                 max_file_size: 10000000,
             }, (error, result) => {
                 if (error || !result)
-                    return reject(error || new Error('Upload failed'));
+                    return reject(error || new Error("Upload failed"));
                 const response = {
                     public_id: result.public_id,
                     version: result.version,
@@ -50,6 +50,34 @@ let CloudinaryService = class CloudinaryService {
                 resolve(response);
             });
             uploadStream.end(file.buffer);
+        });
+    }
+    async uploadBase64(base64String, folder = "business_documents") {
+        return new Promise((resolve, reject) => {
+            cloudinary_1.v2.uploader.upload(base64String, {
+                folder,
+                resource_type: "auto",
+                allowed_formats: ["png", "jpg", "jpeg"],
+                max_file_size: 10000000,
+            }, (error, result) => {
+                if (error || !result)
+                    return reject(error || new Error("Upload failed"));
+                const response = {
+                    public_id: result.public_id,
+                    version: result.version,
+                    signature: result.signature,
+                    width: result.width,
+                    height: result.height,
+                    format: result.format,
+                    resource_type: result.resource_type,
+                    created_at: result.created_at,
+                    bytes: result.bytes,
+                    type: result.type,
+                    url: result.url,
+                    secure_url: result.secure_url,
+                };
+                resolve(response);
+            });
         });
     }
     async deleteFile(public_id) {

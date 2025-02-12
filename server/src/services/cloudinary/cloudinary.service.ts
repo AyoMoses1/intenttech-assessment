@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
-import { UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
-import { CloudinaryConfig } from 'src/services/app-config/configuration';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { v2 as cloudinary } from "cloudinary";
+import { UploadApiResponse, UploadApiErrorResponse } from "cloudinary";
+import { CloudinaryConfig } from "src/services/app-config/configuration";
 
 interface CloudinaryResponse {
   public_id: string;
@@ -23,7 +23,7 @@ interface CloudinaryResponse {
 export class CloudinaryService {
   constructor(private readonly configService: ConfigService) {
     const { cloudName, apiKey, apiSecret } =
-      configService.get<CloudinaryConfig>('cloudinary') as CloudinaryConfig;
+      configService.get<CloudinaryConfig>("cloudinary") as CloudinaryConfig;
 
     cloudinary.config({
       cloud_name: cloudName,
@@ -34,22 +34,22 @@ export class CloudinaryService {
 
   async uploadDocument(
     file: Express.Multer.File,
-    folder: string = 'business_documents',
+    folder: string = "business_documents"
   ): Promise<CloudinaryResponse> {
-    return new Promise((resolve, reject) => {
+    return new Promise<CloudinaryResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder,
-          resource_type: 'auto',
-          allowed_formats: ['pdf', 'png', 'jpg', 'jpeg'],
+          resource_type: "auto",
+          allowed_formats: ["pdf", "png", "jpg", "jpeg"],
           max_file_size: 10000000, // 10MB
         },
         (
           error: UploadApiErrorResponse | undefined,
-          result: UploadApiResponse | undefined,
+          result: UploadApiResponse | undefined
         ) => {
           if (error || !result)
-            return reject(error || new Error('Upload failed'));
+            return reject(error || new Error("Upload failed"));
 
           const response: CloudinaryResponse = {
             public_id: result.public_id,
@@ -67,10 +67,51 @@ export class CloudinaryService {
           };
 
           resolve(response);
-        },
+        }
       );
 
       uploadStream.end(file.buffer);
+    });
+  }
+
+  async uploadBase64(
+    base64String: string,
+    folder: string = "business_documents"
+  ): Promise<CloudinaryResponse> {
+    return new Promise<CloudinaryResponse>((resolve, reject) => {
+      cloudinary.uploader.upload(
+        base64String,
+        {
+          folder,
+          resource_type: "auto",
+          allowed_formats: ["png", "jpg", "jpeg"],
+          max_file_size: 10000000, // 10MB
+        },
+        (
+          error: UploadApiErrorResponse | undefined,
+          result: UploadApiResponse | undefined
+        ) => {
+          if (error || !result)
+            return reject(error || new Error("Upload failed"));
+
+          const response: CloudinaryResponse = {
+            public_id: result.public_id,
+            version: result.version,
+            signature: result.signature,
+            width: result.width,
+            height: result.height,
+            format: result.format,
+            resource_type: result.resource_type,
+            created_at: result.created_at,
+            bytes: result.bytes,
+            type: result.type,
+            url: result.url,
+            secure_url: result.secure_url,
+          };
+
+          resolve(response);
+        }
+      );
     });
   }
 

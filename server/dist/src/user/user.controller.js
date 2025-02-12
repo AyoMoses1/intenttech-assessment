@@ -25,10 +25,15 @@ let UserController = class UserController {
         this.cloudinaryService = cloudinaryService;
     }
     async create(createUserDto, files) {
+        var _a;
         try {
             let profilePhotoUrl = "";
-            if (files.profilePhoto && files.profilePhoto[0]) {
+            if ((_a = files === null || files === void 0 ? void 0 : files.profilePhoto) === null || _a === void 0 ? void 0 : _a[0]) {
                 const uploadResult = await this.cloudinaryService.uploadDocument(files.profilePhoto[0]);
+                profilePhotoUrl = uploadResult.secure_url;
+            }
+            else if (createUserDto.profilePhoto && createUserDto.profilePhoto.startsWith('data:image')) {
+                const uploadResult = await this.cloudinaryService.uploadBase64(createUserDto.profilePhoto);
                 profilePhotoUrl = uploadResult.secure_url;
             }
             const user = await this.userService.create(Object.assign(Object.assign({}, createUserDto), { profilePhoto: profilePhotoUrl }));
@@ -81,10 +86,15 @@ let UserController = class UserController {
         }
     }
     async update(id, updateUserDto, files) {
+        var _a, _b;
         try {
             let profilePhotoUrl = updateUserDto.profilePhoto;
-            if (files.profilePhoto && files.profilePhoto[0]) {
+            if ((_a = files === null || files === void 0 ? void 0 : files.profilePhoto) === null || _a === void 0 ? void 0 : _a[0]) {
                 const uploadResult = await this.cloudinaryService.uploadDocument(files.profilePhoto[0]);
+                profilePhotoUrl = uploadResult.secure_url;
+            }
+            else if ((_b = updateUserDto.profilePhoto) === null || _b === void 0 ? void 0 : _b.startsWith('data:image')) {
+                const uploadResult = await this.cloudinaryService.uploadBase64(updateUserDto.profilePhoto);
                 profilePhotoUrl = uploadResult.secure_url;
             }
             const user = await this.userService.update(+id, Object.assign(Object.assign({}, updateUserDto), { profilePhoto: profilePhotoUrl }));
