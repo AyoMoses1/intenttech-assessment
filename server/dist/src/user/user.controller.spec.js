@@ -9,9 +9,11 @@ const user_address_entity_1 = require("./entities/user-address.entity");
 const user_academic_entity_1 = require("./entities/user-academic.entity");
 const user_entity_fixture_1 = require("./entities/__fixtures__/user-entity.fixture");
 const user_service_1 = require("./services/user/user.service");
+const cloudinary_service_1 = require("../services/cloudinary/cloudinary.service");
 describe("UserController", () => {
     let controller;
     let userService;
+    let cloudinaryService;
     const mockRepository = {
         create: jest.fn(),
         save: jest.fn(),
@@ -21,11 +23,18 @@ describe("UserController", () => {
         delete: jest.fn(),
         remove: jest.fn(),
     };
+    const mockCloudinaryService = {
+        uploadImage: jest.fn(),
+    };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             controllers: [user_controller_1.UserController],
             providers: [
                 user_service_1.UserService,
+                {
+                    provide: cloudinary_service_1.CloudinaryService,
+                    useValue: mockCloudinaryService,
+                },
                 {
                     provide: (0, typeorm_1.getRepositoryToken)(user_info_entity_1.UserInfo),
                     useValue: mockRepository,
@@ -46,6 +55,7 @@ describe("UserController", () => {
         }).compile();
         controller = module.get(user_controller_1.UserController);
         userService = module.get(user_service_1.UserService);
+        cloudinaryService = module.get(cloudinary_service_1.CloudinaryService);
     });
     it("should be defined", () => {
         expect(controller).toBeDefined();
@@ -81,10 +91,22 @@ describe("UserController", () => {
                     },
                 ],
             };
+            const mockFiles = {
+                profilePhoto: [
+                    {
+                        fieldname: "profilePhoto",
+                        originalname: "test.jpg",
+                        buffer: Buffer.from("test"),
+                    },
+                ],
+            };
+            mockCloudinaryService.uploadImage.mockResolvedValue({
+                secure_url: "https://example.com/uploaded-photo.jpg",
+            });
             jest
                 .spyOn(userService, "create")
                 .mockResolvedValue(user_entity_fixture_1.mockCompleteUserInfo);
-            const result = await controller.create(createUserDto);
+            const result = await controller.create(createUserDto, mockFiles);
             expect(result).toEqual({
                 message: "User created successfully",
                 user: user_entity_fixture_1.mockCompleteUserInfo,
@@ -144,10 +166,22 @@ describe("UserController", () => {
                     },
                 ],
             };
+            const mockFiles = {
+                profilePhoto: [
+                    {
+                        fieldname: "profilePhoto",
+                        originalname: "test.jpg",
+                        buffer: Buffer.from("test"),
+                    },
+                ],
+            };
+            mockCloudinaryService.uploadImage.mockResolvedValue({
+                secure_url: "https://example.com/uploaded-photo.jpg",
+            });
             jest
                 .spyOn(userService, "update")
                 .mockResolvedValue(user_entity_fixture_1.mockCompleteUserInfo);
-            const result = await controller.update("1", updateUserDto);
+            const result = await controller.update("1", updateUserDto, mockFiles);
             expect(result).toEqual({
                 message: "User updated successfully",
                 user: user_entity_fixture_1.mockCompleteUserInfo,

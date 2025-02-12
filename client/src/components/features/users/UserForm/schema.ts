@@ -6,6 +6,7 @@ export const formSchema = z.object({
   dob: z.string().min(1, "Date of birth is required"),
   occupation: z.string().min(1, "Occupation is required"),
   gender: z.string().min(1, "Gender is required"),
+  profilePhoto: z.any(), // You can add more specific validation if needed
   contact: z.object({
     email: z
       .string()

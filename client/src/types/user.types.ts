@@ -27,7 +27,7 @@ export interface UserContact {
 
 export interface UserInfo {
   id: number;
-  profilePhoto?: string;
+  profilePhoto?: string | File;
   firstName: string;
   lastName: string;
   dob: string;

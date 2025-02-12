@@ -8,37 +8,174 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
+  HttpException,
+  HttpStatus,
+  ValidationPipe,
+  UsePipes,
 } from "@nestjs/common";
+import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./services/user/user.service";
+import { UserInfo } from "./entities/user-info.entity";
+import { CloudinaryService } from "src/services/cloudinary/cloudinary.service";
 
 @Controller("users")
+@UsePipes(ValidationPipe)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly cloudinaryService: CloudinaryService
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: "profilePhoto", maxCount: 1 }])
+  )
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFiles()
+    files: {
+      profilePhoto?: Express.Multer.File[];
+    }
+  ): Promise<{ message: string; user: UserInfo }> {
+    try {
+      let profilePhotoUrl = "";
+
+      if (files.profilePhoto && files.profilePhoto[0]) {
+        const uploadResult = await this.cloudinaryService.uploadDocument(
+          files.profilePhoto[0]
+        );
+        profilePhotoUrl = uploadResult.secure_url;
+      }
+
+      const user = await this.userService.create({
+        ...createUserDto,
+        profilePhoto: profilePhotoUrl,
+      });
+
+      return {
+        message: "User created successfully",
+        user,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Failed to create user",
+          errors: [error.message],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(): Promise<{ message: string; users: UserInfo[] }> {
+    try {
+      const users = await this.userService.findAll();
+      return {
+        message: "Users retrieved successfully",
+        users,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: "Failed to fetch users",
+          errors: [error.message],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.userService.findOne(+id);
+  async findOne(
+    @Param("id") id: string
+  ): Promise<{ message: string; user: UserInfo }> {
+    try {
+      const user = await this.userService.findOne(+id);
+      return {
+        message: "User retrieved successfully",
+        user,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Failed to fetch user",
+          errors: [error.message],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: CreateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: "profilePhoto", maxCount: 1 }])
+  )
+  async update(
+    @Param("id") id: string,
+    @Body() updateUserDto: CreateUserDto,
+    @UploadedFiles()
+    files: {
+      profilePhoto?: Express.Multer.File[];
+    }
+  ): Promise<{ message: string; user: UserInfo }> {
+    try {
+      let profilePhotoUrl = updateUserDto.profilePhoto;
+
+      if (files.profilePhoto && files.profilePhoto[0]) {
+        const uploadResult = await this.cloudinaryService.uploadDocument(
+          files.profilePhoto[0]
+        );
+        profilePhotoUrl = uploadResult.secure_url;
+      }
+
+      const user = await this.userService.update(+id, {
+        ...updateUserDto,
+        profilePhoto: profilePhotoUrl,
+      });
+
+      return {
+        message: "User updated successfully",
+        user,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Failed to update user",
+          errors: [error.message],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
-  // src/user/user.controller.ts
   @Delete(":id")
-  remove(@Param("id") id: string): Promise<{ message: string }> {
-    return this.userService.remove(+id);
+  async remove(@Param("id") id: string): Promise<{ message: string }> {
+    try {
+      return await this.userService.remove(+id);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Failed to delete user",
+          errors: [error.message],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }

@@ -10,11 +10,13 @@ exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_controller_1 = require("./user.controller");
+const user_service_1 = require("./services/user/user.service");
 const user_info_entity_1 = require("./entities/user-info.entity");
 const user_contact_entity_1 = require("./entities/user-contact.entity");
 const user_address_entity_1 = require("./entities/user-address.entity");
 const user_academic_entity_1 = require("./entities/user-academic.entity");
-const user_service_1 = require("./services/user/user.service");
+const cloudinary_service_1 = require("../services/cloudinary/cloudinary.service");
+const config_1 = require("@nestjs/config");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
@@ -24,11 +26,12 @@ UserModule = __decorate([
                 user_info_entity_1.UserInfo,
                 user_contact_entity_1.UserContact,
                 user_address_entity_1.UserAddress,
-                user_academic_entity_1.UserAcademic
+                user_academic_entity_1.UserAcademic,
             ]),
+            config_1.ConfigModule,
         ],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService],
+        providers: [user_service_1.UserService, cloudinary_service_1.CloudinaryService],
     })
 ], UserModule);
 exports.UserModule = UserModule;

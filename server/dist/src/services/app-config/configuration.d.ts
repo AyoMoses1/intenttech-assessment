@@ -7,6 +7,7 @@ export interface AppConfig {
     database: DbConfig;
     cache: CacheConfig;
     mail: MailConfig;
+    cloudinary: CloudinaryConfig;
 }
 export declare enum AppEnv {
     DEV = "dev",
@@ -36,4 +37,9 @@ export interface MailConfig {
             pass: string;
         };
     };
+}
+export interface CloudinaryConfig {
+    cloudName: string;
+    apiKey: string;
+    apiSecret: string;
 }

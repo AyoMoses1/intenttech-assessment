@@ -89,3 +89,56 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 );
 
 Select.displayName = "Select";
+
+interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  error?: string;
+  previewUrl?: string;
+}
+
+export const FileInput = forwardRef<HTMLInputElement, FileInputProps>(
+  ({ label, error, previewUrl, className, onChange, ...props }, ref) => {
+    return (
+      <div className="mb-6 w-full space-y-2">
+        <label className="block text-base font-medium text-foreground">
+          {label}
+        </label>
+
+        <div className="flex items-center gap-4">
+          {previewUrl && (
+            <div className="h-20 w-20 overflow-hidden rounded-full">
+              <img
+                src={previewUrl}
+                alt="Profile preview"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
+
+          <input
+            type="file"
+            ref={ref}
+            onChange={onChange}
+            className={cn(
+              "file:mr-4 file:px-4 file:py-2",
+              "file:rounded-full file:border-0",
+              "file:text-sm file:font-semibold",
+              "file:bg-primary file:text-primary-foreground",
+              "hover:file:bg-primary/90",
+              error && "text-destructive",
+              className,
+            )}
+            accept="image/*"
+            {...props}
+          />
+        </div>
+
+        {error && (
+          <p className="text-sm font-medium text-destructive">{error}</p>
+        )}
+      </div>
+    );
+  },
+);
+
+FileInput.displayName = "FileInput";

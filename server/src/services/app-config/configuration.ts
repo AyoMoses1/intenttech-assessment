@@ -3,14 +3,14 @@ export const getConfig = (): AppConfig => {
     port: parseInt(process.env.PORT as string, 10) || 3000,
     appEnv: process.env.APP_ENV as AppEnv,
     jwtSecret: process.env.JWT_SECRET as string,
-    logLevel: process.env.LOG_LEVEL || 'info',
+    logLevel: process.env.LOG_LEVEL || "info",
     database: {
       host: process.env.DB_HOST as string,
       port: parseInt(process.env.DB_PORT as string, 10) || 5432,
       user: process.env.DB_USER as string,
       password: process.env.DB_PASSWORD as string,
       dbName: process.env.DB_NAME as string,
-      isSync: process.env.DB_SYNC === 'true',
+      isSync: process.env.DB_SYNC === "true",
     },
     cache: {
       host: process.env.REDIS_HOST as string,
@@ -28,6 +28,11 @@ export const getConfig = (): AppConfig => {
         },
       },
     },
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME as string,
+      apiKey: process.env.CLOUDINARY_API_KEY as string,
+      apiSecret: process.env.CLOUDINARY_API_SECRET as string,
+    },
   };
 };
 
@@ -39,12 +44,13 @@ export interface AppConfig {
   database: DbConfig;
   cache: CacheConfig;
   mail: MailConfig;
+  cloudinary: CloudinaryConfig; // Add this line
 }
 
 export enum AppEnv {
-  DEV = 'dev',
-  TEST = 'test',
-  PROD = 'production',
+  DEV = "dev",
+  TEST = "test",
+  PROD = "production",
 }
 
 export interface DbConfig {
@@ -72,4 +78,10 @@ export interface MailConfig {
       pass: string;
     };
   };
+}
+
+export interface CloudinaryConfig {
+  cloudName: string;
+  apiKey: string;
+  apiSecret: string;
 }

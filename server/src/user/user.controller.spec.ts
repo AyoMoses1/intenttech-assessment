@@ -8,10 +8,12 @@ import { UserAcademic } from "./entities/user-academic.entity";
 import { mockCompleteUserInfo } from "./entities/__fixtures__/user-entity.fixture";
 import { UserService } from "./services/user/user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { CloudinaryService } from "src/services/cloudinary/cloudinary.service";
 
 describe("UserController", () => {
   let controller: UserController;
   let userService: UserService;
+  let cloudinaryService: CloudinaryService;
 
   const mockRepository = {
     create: jest.fn(),
@@ -23,11 +25,19 @@ describe("UserController", () => {
     remove: jest.fn(),
   };
 
+  const mockCloudinaryService = {
+    uploadImage: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
         UserService,
+        {
+          provide: CloudinaryService,
+          useValue: mockCloudinaryService,
+        },
         {
           provide: getRepositoryToken(UserInfo),
           useValue: mockRepository,
@@ -49,6 +59,7 @@ describe("UserController", () => {
 
     controller = module.get<UserController>(UserController);
     userService = module.get<UserService>(UserService);
+    cloudinaryService = module.get<CloudinaryService>(CloudinaryService);
   });
 
   it("should be defined", () => {
@@ -87,11 +98,25 @@ describe("UserController", () => {
         ],
       };
 
+      const mockFiles = {
+        profilePhoto: [
+          {
+            fieldname: "profilePhoto",
+            originalname: "test.jpg",
+            buffer: Buffer.from("test"),
+          } as Express.Multer.File,
+        ],
+      };
+
+      mockCloudinaryService.uploadImage.mockResolvedValue({
+        secure_url: "https://example.com/uploaded-photo.jpg",
+      });
+
       jest
         .spyOn(userService, "create")
         .mockResolvedValue(mockCompleteUserInfo as UserInfo);
 
-      const result = await controller.create(createUserDto);
+      const result = await controller.create(createUserDto, mockFiles);
 
       expect(result).toEqual({
         message: "User created successfully",
@@ -134,37 +159,51 @@ describe("UserController", () => {
       const updateUserDto: CreateUserDto = {
         firstName: "Jane",
         lastName: "Doe",
-        dob: new Date("1990-01-01"), // Added missing required field
+        dob: new Date("1990-01-01"),
         occupation: "Senior Engineer",
-        gender: "Female", // Added missing required field
+        gender: "Female",
         contact: {
           email: "jane.doe@example.com",
           phoneNumber: "+1987654321",
-          fax: undefined, // Optional field
-          linkedInUrl: undefined, // Optional field
+          fax: undefined,
+          linkedInUrl: undefined,
         },
         address: {
-          address: "456 Market St", // Added missing required field
+          address: "456 Market St",
           city: "San Francisco",
           state: "CA",
-          country: "USA", // Added missing required field
-          zipCode: "94105", // Added missing required field
+          country: "USA",
+          zipCode: "94105",
         },
         academics: [
           {
             schoolName: "MIT",
             degree: "Masters in CS",
             graduationYear: 2022,
-            description: "With honors", // Optional field
+            description: "With honors",
           },
         ],
       };
+
+      const mockFiles = {
+        profilePhoto: [
+          {
+            fieldname: "profilePhoto",
+            originalname: "test.jpg",
+            buffer: Buffer.from("test"),
+          } as Express.Multer.File,
+        ],
+      };
+
+      mockCloudinaryService.uploadImage.mockResolvedValue({
+        secure_url: "https://example.com/uploaded-photo.jpg",
+      });
 
       jest
         .spyOn(userService, "update")
         .mockResolvedValue(mockCompleteUserInfo as UserInfo);
 
-      const result = await controller.update("1", updateUserDto);
+      const result = await controller.update("1", updateUserDto, mockFiles);
 
       expect(result).toEqual({
         message: "User updated successfully",

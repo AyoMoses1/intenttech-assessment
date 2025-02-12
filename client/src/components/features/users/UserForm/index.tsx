@@ -30,6 +30,7 @@ export function UserForm({
   const methods = useForm<CreateUserDto>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      profilePhoto: initialData?.profilePhoto || "",
       firstName: initialData?.firstName || "",
       lastName: initialData?.lastName || "",
       dob: initialData?.dob || "",
@@ -101,6 +102,8 @@ export function UserForm({
   };
 
   const handleSubmit = async (data: CreateUserDto) => {
+    console.log({ data });
+
     if (externalSubmit) {
       await externalSubmit(data);
     } else {
