@@ -10,6 +10,11 @@ const helmet_1 = require("helmet");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, body_parser_1.json)());
+    app.enableCors({
+        origin: "*",
+        methods: "*",
+        allowedHeaders: "*",
+    });
     app.use((0, helmet_1.default)());
     app.enableShutdownHooks();
     app.useGlobalPipes(new common_1.ValidationPipe({

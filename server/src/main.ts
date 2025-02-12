@@ -15,6 +15,12 @@ async function bootstrap() {
    */
   app.use(json());
 
+  app.enableCors({
+    origin: "*",
+    methods: "*",
+    allowedHeaders: "*",
+  });
+
   app.use(helmet());
 
   app.enableShutdownHooks();

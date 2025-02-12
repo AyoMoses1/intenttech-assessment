@@ -1,3 +1,5 @@
+// app/layout.tsx
+
 "use client";
 
 import { ReduxProvider } from "@/providers/ReduxProvider";
