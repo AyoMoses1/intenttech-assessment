@@ -39,7 +39,9 @@ __decorate([
     __metadata("design:type", String)
 ], UserAcademic.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_info_entity_1.UserInfo, (userInfo) => userInfo.academics),
+    (0, typeorm_1.ManyToOne)(() => user_info_entity_1.UserInfo, (userInfo) => userInfo.academics, {
+        onDelete: "CASCADE",
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_info_entity_1.UserInfo)
 ], UserAcademic.prototype, "userInfo", void 0);

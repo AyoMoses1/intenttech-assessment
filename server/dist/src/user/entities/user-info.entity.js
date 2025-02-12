@@ -49,16 +49,23 @@ __decorate([
     __metadata("design:type", String)
 ], UserInfo.prototype, "gender", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => user_contact_entity_1.UserContact, (contact) => contact.userInfo, { cascade: true }),
+    (0, typeorm_1.OneToOne)(() => user_contact_entity_1.UserContact, (contact) => contact.userInfo, {
+        cascade: true,
+        onDelete: "CASCADE",
+    }),
     __metadata("design:type", user_contact_entity_1.UserContact)
 ], UserInfo.prototype, "contact", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => user_address_entity_1.UserAddress, (address) => address.userInfo, { cascade: true }),
+    (0, typeorm_1.OneToOne)(() => user_address_entity_1.UserAddress, (address) => address.userInfo, {
+        cascade: true,
+        onDelete: "CASCADE",
+    }),
     __metadata("design:type", user_address_entity_1.UserAddress)
 ], UserInfo.prototype, "address", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => user_academic_entity_1.UserAcademic, (academic) => academic.userInfo, {
         cascade: true,
+        onDelete: "CASCADE",
     }),
     __metadata("design:type", Array)
 ], UserInfo.prototype, "academics", void 0);

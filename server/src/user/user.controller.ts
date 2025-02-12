@@ -36,8 +36,9 @@ export class UserController {
     return this.userService.update(+id, updateUserDto);
   }
 
+  // src/user/user.controller.ts
   @Delete(":id")
-  remove(@Param("id") id: string) {
+  remove(@Param("id") id: string): Promise<{ message: string }> {
     return this.userService.remove(+id);
   }
 }

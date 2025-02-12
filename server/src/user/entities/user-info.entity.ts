@@ -34,14 +34,21 @@ export class UserInfo {
   @Column()
   gender: string;
 
-  @OneToOne(() => UserContact, (contact) => contact.userInfo, { cascade: true })
+  @OneToOne(() => UserContact, (contact) => contact.userInfo, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   contact: UserContact;
 
-  @OneToOne(() => UserAddress, (address) => address.userInfo, { cascade: true })
+  @OneToOne(() => UserAddress, (address) => address.userInfo, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   address: UserAddress;
 
   @OneToMany(() => UserAcademic, (academic) => academic.userInfo, {
     cascade: true,
+    onDelete: "CASCADE",
   })
   academics: UserAcademic[];
 }

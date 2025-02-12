@@ -75,7 +75,7 @@ __decorate([
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UserController.prototype, "remove", null);
 UserController = __decorate([
     (0, common_1.Controller)("users"),

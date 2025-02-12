@@ -43,7 +43,9 @@ __decorate([
     __metadata("design:type", String)
 ], UserAddress.prototype, "zipCode", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => user_info_entity_1.UserInfo),
+    (0, typeorm_1.OneToOne)(() => user_info_entity_1.UserInfo, (userInfo) => userInfo.contact, {
+        onDelete: "CASCADE",
+    }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", user_info_entity_1.UserInfo)
 ], UserAddress.prototype, "userInfo", void 0);

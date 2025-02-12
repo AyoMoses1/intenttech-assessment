@@ -7,5 +7,7 @@ export declare class UserController {
     findAll(): Promise<import("./entities/user-info.entity").UserInfo[]>;
     findOne(id: string): Promise<import("./entities/user-info.entity").UserInfo>;
     update(id: string, updateUserDto: CreateUserDto): Promise<import("./entities/user-info.entity").UserInfo>;
-    remove(id: string): Promise<void>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
 }

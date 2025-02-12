@@ -104,6 +104,9 @@ let UserService = class UserService {
             throw new common_1.NotFoundException(`User with ID ${id} not found`);
         }
         await this.userInfoRepository.remove(user);
+        return {
+            message: `User ${user.firstName} ${user.lastName} has been deleted successfully`,
+        };
     }
 };
 UserService = __decorate([

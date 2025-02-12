@@ -29,7 +29,9 @@ export class UserAddress {
   @Column()
   zipCode: string;
 
-  @OneToOne(() => UserInfo)
+  @OneToOne(() => UserInfo, (userInfo) => userInfo.contact, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   userInfo: UserInfo;
 }

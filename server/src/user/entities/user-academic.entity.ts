@@ -26,7 +26,9 @@ export class UserAcademic {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(() => UserInfo, (userInfo) => userInfo.academics)
+  @ManyToOne(() => UserInfo, (userInfo) => userInfo.academics, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   userInfo: UserInfo;
 }

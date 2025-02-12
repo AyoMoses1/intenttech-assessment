@@ -169,13 +169,16 @@ export class UserService {
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<{ message: string }> {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    // Due to cascade, this will remove related records in other tables
     await this.userInfoRepository.remove(user);
+
+    return {
+      message: `User ${user.firstName} ${user.lastName} has been deleted successfully`,
+    };
   }
 }

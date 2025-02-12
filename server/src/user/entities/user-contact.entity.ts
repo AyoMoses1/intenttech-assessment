@@ -26,7 +26,9 @@ export class UserContact {
   @Column({ nullable: true })
   linkedInUrl: string;
 
-  @OneToOne(() => UserInfo)
+  @OneToOne(() => UserInfo, (userInfo) => userInfo.contact, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   userInfo: UserInfo;
 }
