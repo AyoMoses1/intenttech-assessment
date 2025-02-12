@@ -10,6 +10,9 @@ import { AcademicsStep } from "@/features/users/UserForm/steps/AcademicsStep";
 import { useMultiStepForm } from "@/hooks/useMultistepForm";
 import { ResumePreview } from "@/features/users/UserForm/steps/ResumePreview";
 import { formSchema } from "./schema";
+import { useCreateUserMutation } from "@/features/users/UsersApi";
+import { toast } from "react-hot-toast"; // Optional, for notifications
+import { useRouter } from "next/navigation";
 
 export function UserForm() {
   const methods = useForm<CreateUserDto>({
@@ -43,9 +46,18 @@ export function UserForm() {
 
   const { currentStep, next, back, isFirstStep, isLastStep } =
     useMultiStepForm(4);
+  const [createUser, { isLoading }] = useCreateUserMutation();
+  const router = useRouter();
 
-  const onSubmit = (data: CreateUserDto) => {
-    // Handle form submission
+  const onSubmit = async (data: CreateUserDto) => {
+    try {
+      await createUser(data).unwrap();
+      toast.success("User created successfully");
+      router.push("/users");
+    } catch (error) {
+      toast.error("Failed to create user");
+      console.error("Failed to create user:", error);
+    }
   };
 
   return (
