@@ -175,7 +175,9 @@ describe("UserController", () => {
 
   describe("remove method", () => {
     it("should remove a user", async () => {
-      jest.spyOn(userService, "remove").mockResolvedValue(undefined);
+      jest.spyOn(userService, "remove").mockResolvedValue({
+        message: "User deleted successfully",
+      });
 
       const result = await controller.remove("1");
 
